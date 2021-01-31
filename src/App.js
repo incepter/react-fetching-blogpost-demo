@@ -9,9 +9,7 @@ function SearchUser() {
   const { state, success, indicator } = useFetchOperation({
     condition: !!userId,
     IndicatorComponent: InlineTextIndicator,
-    url: `https://jsonplaceholder.typicode.com/users/${userId}`,
-    retryable: false,
-    maxRetries: 5
+    url: `https://jsonplaceholder.typicode.com/users/${userId}`
   });
 
   return (

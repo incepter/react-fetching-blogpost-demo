@@ -1,5 +1,5 @@
 import React from "react";
-import { FetchStateBuilder, FetchStatus } from "./statics";
+import { FetchStateBuilder, FetchStatus, request } from "./statics";
 import useMemoization from "./useMemoization";
 import useSafeCallback from "./useSafeCallback";
 
@@ -57,8 +57,6 @@ export function useFetchOperation({
     [onStateChange]
   );
 
-  console.log("mem", memoizedDeps.current);
-
   const successHandler = useSafeCallback({
     callback: _onSuccess,
     deps: [memoizedDeps.current] // if these change, the callback won't be invoked! that's the whole trick!
@@ -82,18 +80,21 @@ export function useFetchOperation({
     deps: [memoizedDeps.current, retryable, onStateChange]
   });
 
-  const reload = React.useCallback(() => {
-    if (!condition || !reloadable) {
-      return;
-    }
-    retryMeter.current += 1;
-    const requestData = { url, options };
-    setFetchState(FetchStateBuilder.loading({ requestData }));
-    fetch(url, options)
-      .then((res) => res.json())
-      .then((data) => successHandler(requestData, data))
-      .catch((error) => errorHandler(requestData, error));
-  }, [condition, reloadable, url, options, successHandler, errorHandler]);
+  const reload = React.useCallback(
+    () => {
+      if (!condition || !reloadable) {
+        return;
+      }
+      retryMeter.current += 1;
+      const requestData = { url, options };
+      setFetchState(FetchStateBuilder.loading({ requestData }));
+      request(url, options)
+        .then((data) => successHandler(requestData, data))
+        .catch((error) => errorHandler(requestData, error));
+    },
+    // no need to add successHandler and errorHandler because they depend from url and options ;)
+    [condition, reloadable, url, options]
+  );
 
   React.useEffect(() => {
     reload();
