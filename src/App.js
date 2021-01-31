@@ -3,17 +3,18 @@ import InlineTextIndicator from "./fetchOperation/InlineTextIndicator";
 import { useFetchOperation } from "./fetchOperation/useFetchOperation";
 import "./styles.css";
 
-function SearchUser() {
+function SearchDemo() {
   const [userId, setUserId] = React.useState("");
 
-  const { state, success, indicator } = useFetchOperation({
+  const { state, success, indicator, reload } = useFetchOperation({
     condition: !!userId,
     IndicatorComponent: InlineTextIndicator,
     url: `https://jsonplaceholder.typicode.com/users/${userId}`
   });
 
   return (
-    <>
+    <div>
+      <button onClick={reload}>reload</button>
       <input
         onChange={(e) => setUserId(e.target.value)}
         placeholder="user id"
@@ -21,36 +22,14 @@ function SearchUser() {
       <br />
       {indicator}
       {success && <pre>{JSON.stringify(state, null, "  ")}</pre>}
-    </>
+    </div>
   );
 }
 
 export default function App() {
   return (
     <div className="App">
-      <SearchUser />
+      <SearchDemo />
     </div>
   );
 }
-
-// export default function App() {
-// const { state, success, indicator, reload } = useFetchOperation({
-//   maxRetries: 5,
-//   retryable: false,
-//   IndicatorComponent: InlineTextIndicator,
-//   url: "https://jsonplaceholder.typicode.com/todos/1"
-// });
-
-// return (
-//   <div className="App">
-//     <button onClick={reload}>reload</button>
-//     <br />
-//     {indicator}
-//     {success && (
-//       <div>
-//         <pre>{JSON.stringify(state, null, "  ")}</pre>
-//       </div>
-//     )}
-//   </div>
-// );
-// }
